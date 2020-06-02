@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+    swagger-ui:
+        image: swaggerapi/swagger-ui
+        container_name: swagger-ui-v2
+        depends_on:
+          - api-server
+        environment:
+          - SWAGGER_JSON=/foo/openapi.yaml
+        ports:
+          - 8246:8080
+        volumes:
+          - ./:/foo
+        links:
+          - api-server:server
+        networks: 
+          - backend
+
+    api-server:
+        image: rubengarciacid/api-server
+        container_name: api-server-v2
+        build: .
+        ports:
+          - "4010:4010"
+        networks: 
+          - backend
+networks:
+  backend:
+    driver: "bridge"

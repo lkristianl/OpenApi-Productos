@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: swagger-ui
+  name: swagger-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: swagger-ui
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: swagger-ui
+    spec:
+      containers:
+      - env:
+        - name: SWAGGER_JSON
+          value: /foo/openapi.yaml
+        image: swaggerapi/swagger-ui
+        imagePullPolicy: ""
+        name: swagger-ui
+        ports:
+        - containerPort: 8080
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}

@@ -1,0 +1,24 @@
+{
+  "name": "practica2-aos",
+  "version": "1.0.0",
+  "description": "Implementación de la API de Productos para la asignatura de AOS",
+  "main": "main.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "localStorage": "^1.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RYSKZ/API-Productos.git"
+  },
+  "author": "Amit Karamchandani Batra",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RYSKZ/API-Productos/issues"
+  },
+  "homepage": "https://github.com/RYSKZ/API-Productos#readme"
+}

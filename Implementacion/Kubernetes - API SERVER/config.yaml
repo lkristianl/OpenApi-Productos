@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api-server
+  name: api-server
+spec:
+  type: NodePort
+  selector:
+    io.kompose.service: api-server
+  ports:
+  - port: 4010
+    targetPort: 4010
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: swagger-ui
+  name: swagger-ui
+spec:
+  type: NodePort
+  ports:
+  - name: "8246"
+    port: 8246
+    targetPort: 8080
+    nodePort: 31637
+  selector:
+    io.kompose.service: swagger-ui
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api-server
+  name: api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api-server
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: api-server
+    spec:
+      containers:
+      - image: rubengarciacid/api-server
+        imagePullPolicy: ""
+        name: api-server
+        ports:
+        - containerPort: 4010
+        volumeMounts:
+        - mountPath: /especificacion
+          name: openapi
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: openapi
+        hostPath:
+          path: /
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: swagger-ui
+  name: swagger-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: swagger-ui
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: swagger-ui
+    spec:
+      containers:
+      - env:
+        - name: SWAGGER_JSON
+          value: /openapi.yaml
+        image: pollitorex/swagger
+        imagePullPolicy: ""
+        name: swagger-ui
+        ports:
+        - containerPort: 8080
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}
