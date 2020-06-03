@@ -1,0 +1,1 @@
+docker build -t pollitorex/logging -f Dockerfile .

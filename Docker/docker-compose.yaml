@@ -1,20 +1,75 @@
 version: "3.7"
 services:
-    swagger-ui:
+    swagger-ui-productos:
         image: swaggerapi/swagger-ui
-        container_name: swagger-ui
+        container_name: swagger-ui-productos
         depends_on:
-          - api-mock
+          - api-mock-productos
         environment:
-          - SWAGGER_JSON=/foo/openapi.yaml
+          - SWAGGER_JSON=/foo/productos.yaml
         ports:
           - 8246:8080
         volumes:
           - ./:/foo
 
-    api-mock:
-        image: rubengarciacid/api-mock
-        container_name: api-mock
+    api-mock-productos:
+        image: pollitorex/productos
+        container_name: api-mock-productos
         build: .
         ports:
             - "4010:4010"
+
+    swagger-ui-pollitorex-pedidos:
+        image: swaggerapi/swagger-ui
+        container_name: swagger-ui-pedidos
+        depends_on:
+          - api-mock-pedidos
+        environment:
+          - SWAGGER_JSON=/foo/pedidos.yaml
+        ports:
+          - 8247:8080
+        volumes:
+          - ./:/foo
+
+    api-mock-pedidos:
+        image: pollitorex/pedidos
+        container_name: api-mock-pedidos
+        build: .
+        ports:
+            - "4011:4010"
+    swagger-ui-facturacion:
+        image: swaggerapi/swagger-ui
+        container_name: swagger-ui-facturacion
+        depends_on:
+          - api-mock-facturacion
+        environment:
+          - SWAGGER_JSON=/foo/facturacion.yaml
+        ports:
+          - 8248:8080
+        volumes:
+          - ./:/foo
+
+    api-mock-facturacion:
+        image: pollitorex/facturacion
+        container_name: api-mock-facturacion
+        build: .
+        ports:
+            - "4012:4010"
+    swagger-ui-logging:
+        image: swaggerapi/swagger-ui
+        container_name: swagger-ui-logging
+        depends_on:
+          - api-mock-logging
+        environment:
+          - SWAGGER_JSON=/foo/logging.yaml
+        ports:
+          - 8249:8080
+        volumes:
+          - ./:/foo
+
+    api-mock-logging:
+        image: pollitorex/logging
+        container_name: api-mock-logging
+        build: .
+        ports:
+            - "4013:4010"

@@ -1,0 +1,586 @@
+openapi: 3.0.3
+info:
+  title: Especificacion de servicio de facturacion - UPM
+  version: 0.0.1
+  description: Especificacion `OpenApi` de **AOS**
+tags: 
+  - name: Organizacion
+  - name: Facturas
+servers:
+  - url: '{schema}://{servername}:{port}/api/v1'
+    description: 'AOS Production server (uses live data)'
+    variables:
+      schema:
+        enum:
+          - http
+          - https
+        default: http
+      servername:
+        default: localhost
+      port:
+        default: '80'
+paths:
+  /Organizacion:
+    post:
+      operationId: api_organizacion_post
+      tags: 
+        - Organizacion
+      summary: Alta de una nueva organizacion
+      description: Alta de una nueva organizacion
+      requestBody: 
+        $ref: '#/components/requestBodies/OrganizacionRequestBody'
+      responses:
+        '201':
+          description: '`Created`: La  organizacion ha sido creada'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizacion'
+        '400':
+          description: '`Bad Request`: Solicitud Erronea'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizacion'
+
+  '/Organizacion/{idOrganizacion}':
+    delete:
+      operationId: api_organizacion_delete
+      tags: 
+        - Organizacion
+      summary: Elimina una organizacion
+      description: Elimina la organizacion con idOrganizacion
+      parameters:
+        - $ref: '#/components/parameters/idOrganizacion'
+      responses:
+        '204':
+          description: "La organización ha sido eliminada"
+        '404':
+          $ref: '#/components/responses/Respuesta_404'
+
+    put:
+      summary: Actualiza un recurso de tipo Organizacion
+      tags:
+        - Organizacion
+      description: 'Actualiza el quipo identificado por `userId`.'
+      operationId: api_organizacion_put
+      parameters:
+        - $ref: '#/components/parameters/idOrganizacion'
+      requestBody:
+        $ref: '#/components/requestBodies/OrganizacionRequestBody'
+      responses:
+        '209':
+          description: '`Content Returned`: la organización existía previamente y ha sido actualizada'
+        '400':
+          $ref: '#/components/responses/Respuesta_400'
+        '404':
+           $ref: '#/components/responses/Respuesta_404'
+
+  /Factura:
+    post:
+      operationId: api_factura_post
+      tags: 
+        - Facturas
+      summary: 'Alta de una nueva factura'
+      description: 'Alta de una nueva factura'
+      requestBody: 
+        $ref: '#/components/requestBodies/FacturaRequestBody'
+      responses:
+        '201':
+          description: '`Created`: La  factura ha sido creada'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '400':
+          $ref: '#/components/responses/Respuesta_404'
+                
+    get:
+      operationId: api_facturaF_get
+      tags:
+        - Facturas
+      summary: Obtiene factura por el rango de fechas
+      description: Obtiene la factura que coincida con la búsqueda
+      parameters:
+        - $ref: '#/components/parameters/fechaRango1'
+        - $ref: '#/components/parameters/fechaRango2'
+        - $ref: '#/components/parameters/textoLibre'
+      responses:
+        '200':
+          description: Array de las facturas generadas en las fechas comprendidas entre el rango especificado
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Factura'
+        '404':
+          $ref: '#/components/responses/Respuesta_404'
+          
+  '/Factura/{numero}':
+    delete:
+      operationId: api_factura_delete
+      tags: 
+        - Facturas
+      summary: Elimina una factura
+      description: Elimina la factura con `numero`
+      parameters:
+        - $ref: '#/components/parameters/numeroFactura'
+      responses:
+        '204':
+          description: "La factura ha sido eliminada"
+        '404':
+          $ref: '#/components/responses/Respuesta_404'
+
+    put:
+      summary: Actualiza un recurso de tipo Factura
+      tags:
+        - Facturas
+      description: 'Actualiza la factura identificado por `userId`.'
+      operationId: api_factura_put
+      parameters:
+        - $ref: '#/components/parameters/numeroFactura'
+      requestBody:
+        $ref: '#/components/requestBodies/FacturaRequestBody'
+      responses:
+        '209':
+          description: '`Content Returned`: La factura existía previamente y ha sido actualizada'
+        '400':
+          $ref: '#/components/responses/Respuesta_400'
+        '404':
+          $ref: '#/components/responses/Respuesta_404'
+          
+    get:
+      operationId: api_facturaN_get
+      tags: 
+        - Facturas
+      summary: Obtiene factura por numero
+      description: Obtiene la factura que coincida con la búsqueda
+      parameters:
+        - $ref: '#/components/parameters/numeroFactura'
+      responses:
+        '200':
+          description: Factura
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '404':
+          $ref: '#/components/responses/Respuesta_404'
+
+  
+  '/Factura/Pedido/{estado}':
+    get:
+      operationId: api_facturaE_get
+      tags:
+        - Facturas
+      summary: Obtiene factura por estado
+      description: Obtiene la factura que coincida con la búsqueda
+      parameters:
+        - $ref: '#/components/parameters/estadoPedido'
+      responses:
+        '200':
+          description: Array de Facturas que cumplen con el estado indicado
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Factura'
+        '404':
+          $ref: '#/components/responses/Respuesta_404'
+          
+  '/Factura/Organizacion/{idOrganizacion}':
+    get:
+      operationId: api_facturaO_get
+      tags:
+        - Facturas
+      summary: Obtiene factura por la organizacion asociada
+      description: Obtiene la factura que coincida con la búsqueda
+      parameters:
+        - $ref: '#/components/parameters/idOrganizacion'
+      responses:
+        '200':
+          description: Array de facturas para la organización con el ID buscado
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Factura'
+        '404':
+          $ref: '#/components/responses/Respuesta_404'
+
+components:
+  schemas:
+    Organizacion:
+      title: Organizacion
+      type: object
+      properties:
+        idOrganizacion:
+          type: integer
+          format: int64
+          example: 32165478
+        nombre: 
+          type: string 
+        descripcion:
+          type: string
+        teléfono: 
+          type: string
+        e-mail: 
+          type: string
+          format: email
+        direccionPostal:
+          type: object
+          description: Direccion Postal
+          properties:
+            calle:
+              type: string
+            localidad:
+              type: string
+            provincia:
+              type: string
+            codPostal: 
+              type: string
+            país: 
+              type: string
+        _links:
+          type: object
+          description: link relations
+          properties:
+            parent: 
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: url
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: url
+                    
+      example: 
+        value:
+          organización: 
+            idOrganizacion: 1
+            nombre: Inditex
+            descripcion: Indi
+            teléfono: 234974239534750
+            direccionPostal:
+              calle: edrasdas
+              localidad: Madrid
+              provincia: Madrid
+              codPostal: 23023
+              país: España
+            links:
+              parent:
+                href: /api/v1-facturas/Organizacion
+              self: 
+                href: /api/v1-facturas/Organizacion/1
+    
+    Factura:
+      title: Factura
+      type: object
+      properties:
+        numero:
+          type: integer
+          format: int64
+          example: 123456789
+          minimum: 1
+        fecha: 
+          type: string
+          format: date
+        pedidos:
+          type: array
+          description: Pedidos que incluye la factura
+          items:
+            $ref: "#/components/schemas/Pedido"
+        organizacion:
+          $ref: "#/components/schemas/Organizacion"
+        concepto:
+          type: string
+        _links:
+          type: object
+          description: link relations
+          properties:
+            parent: 
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: url
+            self:
+              type: object
+              properties:
+               href:
+                 type: string
+                 format: url
+                    
+    Pedido:
+      title: Pedido
+      type: object
+      properties:
+        idPedido:
+            type: integer
+            format: int64
+            example: 111111111
+            minimum: 1
+        tipo:
+            type: string
+            description: indica si es pedido de compra o de venta
+            enum:
+                - "compra"
+                - "venta"
+        producto:
+            $ref: "#/components/schemas/Producto"
+        organizacion:
+            $ref: "#/components/schemas/Organizacion"
+        cantidad:
+            type: integer
+            format: int32
+            example: 23
+            minimum: 1
+        fechaCompra:
+            type: string
+            format: date
+        estado:
+            type: string
+            description: estado del pedido
+            enum:
+                - "abierto"
+                - "aceptado"
+                - "enviado"
+                - "recibido"
+        _links:
+            type: object
+            description: link relations
+            properties:
+                parent: 
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      format: url
+                self:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      format: url
+     
+    Producto:
+      title: Producto
+      type: object
+      properties:
+        idProducto:
+          type: integer
+          format: int64
+          example: 123456789
+          minimum: 1
+        descripcion:
+          type: string
+        categoria:
+          $ref: "#/components/schemas/Categoria"
+        _links:
+          type: object
+          description: link relations
+          properties:
+            parent: 
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: url
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: url
+                  
+    Categoria:
+      title: Categoria
+      type: object
+      properties:
+        idCategoria:
+          type: integer
+          format: int64
+          example: 123456789
+          minimum: 1
+        descripcion:
+          type: string
+        _links:
+          type: object
+          description: link relations
+          properties:
+            parent: 
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: url
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: url
+      
+    Message:
+      type: object
+      description: Representación de la respuesta `HTTP`
+      properties:
+        code:
+          description: Código de estado HTTP
+          type: integer
+          format: int64
+        message:
+          description: Mensaje de respuesta
+          type: string
+                  
+  requestBodies:
+    OrganizacionRequestBody:
+      description: 'Datos para generar una `organizacion`'
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              idOrganizacion:
+                type: integer
+                format: int64
+              nombre: 
+                type: string 
+              descripcion:
+                type: string
+              teléfono: 
+                type: string
+              e-mail: 
+                type: string
+                format: email
+              direccionPostal:
+                type: object
+                properties:
+                  calle:
+                    type: string
+                  localidad:
+                    type: string
+                  provincia:
+                    type: string
+                  codPostal: 
+                    type: string
+                  país: 
+                    type: string
+  
+    FacturaRequestBody:
+      description: 'Datos para generar una `factura`'
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              numero:
+                type: integer
+                format: int64
+                minimum: 1
+              fecha: 
+                type: string
+                format: "date-time"
+              pedidos:
+                type: array
+                description: pedidos que incluye la factura
+                items:
+                  $ref: "#/components/schemas/Pedido"
+              organizacion:
+                $ref: "#/components/schemas/Organizacion"
+              concepto:
+                type: string
+          
+  responses:
+    Respuesta_404:
+      description: "`Not Found` - Equipo no encontrado"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          examples:
+            response-404:
+              $ref: '#/components/examples/response-404'
+    Respuesta_400:
+      description: "`Bad Request`:solicitud erronea"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          examples:
+            response-400:
+              $ref: '#/components/examples/response-400'
+
+  examples:
+    response-400:
+      value:
+        code: 400
+        message: 'Bad Request: información proporcionada erronea'
+    response-404:
+      value:
+        code: 404
+        message: 'Not Found: equipo no encontrado'
+    response-422:
+      value:
+        code: 422
+        message: 'Unprocessable entity: faltan datos para rellenar la solicitud'
+        
+        
+  parameters: 
+    idOrganizacion:
+      name: idOrganizacion
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+                
+    numeroFactura:
+      name: numero
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        
+    estadoPedido:
+        name: estado
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: [
+            "abierto",
+            "aceptado",
+            "enviado",
+            "recibido",
+          ]
+        
+    textoLibre:
+      name: texto
+      in: query
+      schema:
+        type: string
+        
+    fechaRango1:
+      name: fechaInicial
+      in: query
+      schema:
+        type: string
+        format: date
+        
+    fechaRango2:
+      name: fechaFinal
+      in: query
+      schema:
+        type: string
+        format: date

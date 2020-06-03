@@ -1,0 +1,388 @@
+openapi: 3.0.3
+info:
+  title: Logging API
+  description: "*Logging API* for AOS subject"
+  license:
+    name: Creative Commons Zero v1.0 Universal
+    url: https://github.com/MaanuelMM/logging-api-aos/blob/master/LICENSE
+  version: 2.0.3
+  contact:
+    name: Manuel Martín Malagón
+    url: https://github.com/MaanuelMM
+    email: manuel.martin.malagon@alumnos.upm.es
+servers:
+  - url: "{schema}://{servername}:{port}"
+    description: "[AOS] Logging API microservice mock server"
+    variables:
+      schema:
+        enum:
+          - http
+          - https
+        default: http
+      servername:
+        default: localhost
+      port:
+        default: "4010"
+tags:
+  - name: Events
+    description: "Endpoints to manipulate software events"
+paths:
+  /events:
+    options:
+      operationId: api_event_options
+      tags: [Events]
+      summary: Possible request methods with /events path
+      description: Get possible request methods with /events path
+      responses:
+        "204":
+          description: List of all possible request methods in /events path
+          headers:
+            Allow:
+              $ref: "#/components/headers/Allow"
+        "401":
+          $ref: "#/components/responses/401"
+    get:
+      operationId: api_event_cget
+      tags: [Events]
+      summary: Events list (with query parameters)
+      description: Get events list with query parameters (optional)
+      parameters:
+        - $ref: "#/components/parameters/origin"
+        - $ref: "#/components/parameters/dateFrom"
+        - $ref: "#/components/parameters/dateTo"
+        - $ref: "#/components/parameters/text"
+        - $ref: "#/components/parameters/level"
+      responses:
+        "200":
+          description: JSON array or CSV text string with all known teams
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Event"
+            text/csv:
+              schema:
+                $ref: "#/components/schemas/EventCSV"
+          headers:
+            Etag:
+              $ref: "#/components/headers/Etag"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+    post:
+      operationId: api_event_post
+      tags: [Events]
+      summary: Event save
+      description: Save event
+      requestBody:
+        $ref: "#/components/requestBodies/EventRequestBody"
+      responses:
+        "201":
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+  /events/{eventId}:
+    options:
+      operationId: api_event_id_options
+      tags: [Events]
+      summary: Possible request methods with /events/{eventId} path
+      description: Get possible request methods with /events/{eventId} path
+      parameters:
+        - $ref: "#/components/parameters/eventId"
+      responses:
+        "204":
+          description: List of all possible request methods in /events/{eventId} path
+          headers:
+            Allow:
+              $ref: "#/components/headers/Allow"
+        "401":
+          $ref: "#/components/responses/401"
+    get:
+      operationId: api_team_id_get
+      tags: [Events]
+      summary: Team information given an ID
+      description: Get event information from the given ID
+      parameters:
+        - $ref: "#/components/parameters/eventId"
+      responses:
+        "200":
+          description: JSON or CSV team information (from ID)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+            text/csv:
+              schema:
+                $ref: "#/components/schemas/EventCSV"
+          headers:
+            Etag:
+              $ref: "#/components/headers/Etag"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+components:
+  schemas:
+    Event:
+      title: Event
+      type: object
+      properties:
+        event:
+          type: object
+          properties:
+            eventId:
+              type: integer
+              format: int64
+              x-faker: finance.amount # because of positives numbers
+              example: 878923748
+              minimum: 1
+            origin:
+              type: string
+              x-faker: name.jobArea # recreating a multipurpose logger
+              example: "ORDERS"
+            date: # not necessary
+              type: string
+              format: "date-time"
+            message:
+              type: string
+              x-faker: hacker.phrase # just for fun hahaha
+            level:
+              type: string
+              enum:
+                - "info"
+                - "warn"
+                - "error"
+            _links:
+              type: object
+              description: link relations
+              properties:
+                parent:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      format: url
+                      x-faker: internet.url
+                self:
+                  properties:
+                    href:
+                      type: string
+                      format: url
+                      x-faker: internet.url
+      x-examples:
+        example-1:
+          eventId: 89776253
+          origin: "ORDERS"
+          date: "2020-03-08T18:30:55.855Z"
+          message: "Order #127 confirmed. Product: #12. Quantity: #2. Company: #32165478"
+          level: "info"
+          _links:
+            parent:
+              href: /events
+            self:
+              href: /events/89776253
+    EventCSV:
+      title: EventCSV
+      type: string
+      x-faker: lorem.paragraphs
+      example: >
+        eventId,origin,date,message,level,_parent_href_link,_self_href_link
+        89776253,"ORDERS","2020-03-08T18:30:55.855Z","Order #127 confirmed. Product: #12. Quantity: #2. Company: #32165478","info","/events","/events/89776253"
+    EventRequestBody:
+      title: EventRequestBody
+      type: object
+      properties:
+        origin:
+          type: string
+          example: "ORDERS"
+        date:
+          type: string
+          format: "date-time"
+        message:
+          type: string
+        level:
+          type: string
+          enum:
+            - "info"
+            - "warn"
+            - "error"
+          default: "info" # if there is no level, "info" is recorded
+      required: # if there is no date, current one is recorded
+        - origin
+        - message
+      x-examples:
+        example-1:
+          origin: "ORDERS"
+          date: "2020-03-08T18:30:55.855Z"
+          message: "Order #127 confirmed. Product: #12. Quantity: #2. Company: #32165478"
+          level: "info"
+    Message:
+      type: object
+      description: "`HTTP` response presentation"
+      properties:
+        code:
+          description: HTTP status code
+          type: integer
+          format: int64
+        message:
+          description: HTTP message
+          type: string
+  responses:
+    "400":
+      description: Malformed Request Body
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          examples:
+            "400":
+              $ref: "#/components/examples/400"
+    "401":
+      description: Unauthorized Token Or Missing X-API-Key Header
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          examples:
+            "401":
+              $ref: "#/components/examples/401"
+    "404":
+      description: Event Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          examples:
+            "404":
+              $ref: "#/components/examples/404"
+    "422":
+      description: Content-Type Missing Or Event Fields Missing
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          examples:
+            "422":
+              $ref: "#/components/examples/422"
+  examples:
+    "400":
+      value:
+        code: 400
+        message: Bad Request
+    "401":
+      value:
+        code: 401
+        message: Unauthorized
+    "404":
+      value:
+        code: 404
+        message: Not Found
+    "422":
+      value:
+        code: 422
+        message: Unprocessable Entity
+  parameters:
+    eventId:
+      name: eventId
+      in: path
+      description: ID of the event
+      required: true
+      schema:
+        type: integer
+        format: int64
+    origin:
+      name: origin
+      in: query
+      description: Origin of the event
+      schema:
+        type: string
+    dateFrom:
+      name: dateFrom
+      in: query
+      description: Date of the event (from)
+      schema:
+        type: string
+        format: "date-time"
+    dateTo:
+      name: dateTo
+      in: query
+      description: Date of the event (to)
+      schema:
+        type: string
+        format: "date-time"
+    text:
+      name: text
+      in: query
+      description: Text of the event
+      schema:
+        type: string
+    level:
+      name: level
+      in: query
+      description: Level of the event
+      schema:
+        type: string
+        enum:
+          - "info"
+          - "warn"
+          - "error"
+  headers:
+    Etag:
+      description: |
+        The RFC7232 ETag header field in a response provides the current entity-
+        tag for the selected resource. An entity-tag is an opaque identifier for
+        different versions of a resource over time, regardless whether multiple
+        versions are valid at the same time. An entity-tag consists of an opaque
+        quoted string, possibly prefixed by a weakness indicator.
+      example: W/"xy", "5", "7da7a728-f910-11e6-942a-68f728c1ba70"
+      required: true
+      schema:
+        type: string
+    Allow:
+      description: |
+        All the possible request methods are returned in the header for self-
+        discovering robots and for developers too.
+      example: "GET,DELETE,HEAD,PATCH,POST,PUT"
+      required: true
+      schema:
+        type: string
+    Location:
+      description: |
+        URI (Uniform Resource Identifier) string to the new created resource.
+      example: /events/89776253
+      required: true
+      schema:
+        type: string
+  requestBodies:
+    EventRequestBody:
+      description: "Data for generating an `event`"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EventRequestBody"
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+security:
+  - ApiKeyAuth: [] # applied globally

@@ -1,123 +1,469 @@
 apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.21.0 (992df58d8)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: api-mock
-  name: api-mock
-spec:
-  type: NodePort
-  selector:
-    io.kompose.service: api-mock
-  ports:
-  - port: 4010
-    targetPort: 4010
-status:
-  loadBalancer: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.21.0 (992df58d8)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: swagger-ui
-  name: swagger-ui
-spec:
-  type: NodePort
-  ports:
-  - name: "8246"
-    port: 8246
-    targetPort: 8080
-    nodePort: 31637
-  selector:
-    io.kompose.service: swagger-ui
-status:
-  loadBalancer: {}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.21.0 (992df58d8)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: api-mock
-  name: api-mock
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      io.kompose.service: api-mock
-  strategy: {}
-  template:
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.21.0 (992df58d8)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: api-mock
-    spec:
-      containers:
-      - image: rubengarciacid/api-mock
-        imagePullPolicy: ""
-        name: api-mock
-        ports:
-        - containerPort: 4010
-        volumeMounts:
-        - mountPath: /especificacion
-          name: openapi
-        resources: {}
-      restartPolicy: Always
-      serviceAccountName: ""
-      volumes:
-      - name: openapi
-        hostPath:
-          path: /
-status: {}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.21.0 (992df58d8)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: swagger-ui
-  name: swagger-ui
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      io.kompose.service: swagger-ui
-  strategy: {}
-  template:
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.21.0 (992df58d8)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: swagger-ui
-    spec:
-      containers:
-      - env:
-        - name: SWAGGER_JSON
-          value: /openapi.yaml
-        image: pollitorex/swagger
-        imagePullPolicy: ""
-        name: swagger-ui
-        ports:
-        - containerPort: 8080
-        resources: {}
-      restartPolicy: Always
-      serviceAccountName: ""
-status: {}
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-facturacion
+    name: api-mock-facturacion
+  spec:
+    type: NodePort
+    ports:
+    - name: "4012"
+      port: 4012
+      targetPort: 4010
+    selector:
+      io.kompose.service: api-mock-facturacion
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-logging
+    name: api-mock-logging
+  spec:
+    type: NodePort
+    ports:
+    - name: "4013"
+      port: 4013
+      targetPort: 4010
+    selector:
+      io.kompose.service: api-mock-logging
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-pedidos
+    name: api-mock-pedidos
+  spec:
+    type: NodePort
+    ports:
+    - name: "4011"
+      port: 4011
+      targetPort: 4010
+    selector:
+      io.kompose.service: api-mock-pedidos
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-productos
+    name: api-mock-productos
+  spec:
+    type: NodePort
+    ports:
+    - name: "4010"
+      port: 4010
+      targetPort: 4010
+    selector:
+      io.kompose.service: api-mock-productos
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-facturacion
+    name: swagger-ui-facturacion
+  spec:
+    type: NodePort
+    ports:
+    - name: "8248"
+      port: 8248
+      targetPort: 8080
+      nodePort: 31637
+    selector:
+      io.kompose.service: swagger-ui-facturacion
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-logging
+    name: swagger-ui-logging
+  spec:
+    type: NodePort
+    ports:
+    - name: "8249"
+      port: 8249
+      targetPort: 8080
+      nodePort: 31638
+    selector:
+      io.kompose.service: swagger-ui-logging
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-pollitorex-pedidos
+    name: swagger-ui-pollitorex-pedidos
+  spec:
+    type: NodePort
+    ports:
+    - name: "8247"
+      port: 8247
+      targetPort: 8080
+      nodePort: 31639
+    selector:
+      io.kompose.service: swagger-ui-pollitorex-pedidos
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-productos
+    name: swagger-ui-productos
+  spec:
+    type: NodePort
+    ports:
+    - name: "8246"
+      port: 8246
+      targetPort: 8080
+      nodePort: 31640
+    selector:
+      io.kompose.service: swagger-ui-productos
+  status:
+    loadBalancer: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-facturacion
+    name: api-mock-facturacion
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: api-mock-facturacion
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: api-mock-facturacion
+      spec:
+        containers:
+        - image: pollitorex/facturacion
+          imagePullPolicy: ""
+          name: api-mock-facturacion
+          ports:
+          - containerPort: 4010
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-logging
+    name: api-mock-logging
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: api-mock-logging
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: api-mock-logging
+      spec:
+        containers:
+        - image: pollitorex/logging
+          imagePullPolicy: ""
+          name: api-mock-logging
+          ports:
+          - containerPort: 4010
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-pedidos
+    name: api-mock-pedidos
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: api-mock-pedidos
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: api-mock-pedidos
+      spec:
+        containers:
+        - image: pollitorex/pedidos
+          imagePullPolicy: ""
+          name: api-mock-pedidos
+          ports:
+          - containerPort: 4010
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: api-mock-productos
+    name: api-mock-productos
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: api-mock-productos
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: api-mock-productos
+      spec:
+        containers:
+        - image: pollitorex/productos
+          imagePullPolicy: ""
+          name: api-mock-productos
+          ports:
+          - containerPort: 4010
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-facturacion
+    name: swagger-ui-facturacion
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: swagger-ui-facturacion
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: swagger-ui-facturacion
+      spec:
+        containers:
+        - env:
+          - name: SWAGGER_JSON
+            value: /foo/facturacion.yaml
+          image: pollitorex/swagger-ui-facturacion
+          imagePullPolicy: ""
+          name: swagger-ui-facturacion
+          ports:
+          - containerPort: 8080
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-logging
+    name: swagger-ui-logging
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: swagger-ui-logging
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: swagger-ui-logging
+      spec:
+        containers:
+        - env:
+          - name: SWAGGER_JSON
+            value: /foo/logging.yaml
+          image: pollitorex/swagger-ui-logging
+          imagePullPolicy: ""
+          name: swagger-ui-logging
+          ports:
+          - containerPort: 8080
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-pollitorex-pedidos
+    name: swagger-ui-pollitorex-pedidos
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: swagger-ui-pollitorex-pedidos
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: swagger-ui-pollitorex-pedidos
+      spec:
+        containers:
+        - env:
+          - name: SWAGGER_JSON
+            value: /foo/pedidos.json
+          image: pollitorex/swagger-ui-pedidos
+          imagePullPolicy: ""
+          name: swagger-ui-pedidos
+          ports:
+          - containerPort: 8080
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kompose.cmd: kompose convert -o config.yaml
+      kompose.version: 1.21.0 (992df58d8)
+    creationTimestamp: null
+    labels:
+      io.kompose.service: swagger-ui-productos
+    name: swagger-ui-productos
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: swagger-ui-productos
+    strategy: {}
+    template:
+      metadata:
+        annotations:
+          kompose.cmd: kompose convert -o config.yaml
+          kompose.version: 1.21.0 (992df58d8)
+        creationTimestamp: null
+        labels:
+          io.kompose.service: swagger-ui-productos
+      spec:
+        containers:
+        - env:
+          - name: SWAGGER_JSON
+            value: /foo/productos.yaml
+          image: pollitorex/swagger-ui-productos
+          imagePullPolicy: ""
+          name: swagger-ui-productos
+          ports:
+          - containerPort: 8080
+          resources: {}
+        restartPolicy: Always
+        serviceAccountName: ""
+        volumes: null
+  status: {}
+kind: List
+metadata: {}
+

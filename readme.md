@@ -9,4 +9,4 @@ Dentro de la carpeta de'Kubernetes':
 
 La justificacion, explicacion y realizacion de la practica 2 de AOS se incluye en el Word adjunto.
 
-link de mega.nz: https://mega.nz/file/Vpg1hIAY#FQKCquIIH3C5crkh0ih6kZik0w7A3EMUhS_ipuIbKv0
+link de mega.nz: https://mega.nz/file/98gTUJSQ#ENezptmw4EK1KWiBmJrbWhQwjocXbbLafYxTJdmt8EE

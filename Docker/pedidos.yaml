@@ -1,0 +1,1477 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Pedidos AOS",
+    "version": "1.0",
+    "description": "API de Pedidos para Arquitecturas Orientadas a Servicios desarrollada por:\nSantiago Caro, \nMiguel Angel Perez &\nIván Pulido",
+    "contact": {
+      "name": "Santiago Caro, Miguel Angel Perez & Iván Pulido"
+    }
+  },
+  "servers": [
+    {
+      "url": "{schema}://{servername}:{port}",
+      "variables": {
+        "schema": {
+          "enum": [
+            "http",
+            "https"
+          ],
+          "default": "http"
+        },
+        "servername": {
+          "default": "localhost"
+        },
+        "port": {
+          "default": "4010"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/pedidos": {
+      "get": {
+        "summary": "Obtener Pedidos",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array de pedidos completa o filtrada",
+                  "items": {
+                    "$ref": "#/components/schemas/Pedido"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "PEDIDO",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_logeado"
+          },
+          "403": {
+            "$ref": "#/components/responses/403_permisos"
+          }
+        },
+        "operationId": "get-pedido",
+        "description": "Retorna una Lista de pedidos completa, tambien se puede buscar por campos especificos dentro del pedido, estos vienen como consultas dentro de la URL",
+        "tags": [
+          "Pedidos"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "compra",
+                "venta"
+              ]
+            },
+            "in": "query",
+            "name": "tipo"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "aceptado",
+                "enviado",
+                "recibido",
+                "abierto"
+              ]
+            },
+            "in": "query",
+            "name": "estado"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "query",
+            "name": "producto",
+            "description": ""
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cliente",
+                "proveedor"
+              ]
+            },
+            "in": "query",
+            "name": "organizacion"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "texto"
+          }
+        ]
+      },
+      "options": {
+        "summary": "Opciones soportadas",
+        "operationId": "options-pedidos",
+        "description": "Provee una lista de los metodos HTTP soportados en este PATH",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Cabecera Allow en donde van las operacions"
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "PEDIDO",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Pedidos"
+        ]
+      },
+      "post": {
+        "summary": "Añadir Pedido",
+        "operationId": "post-pedidos",
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/201_addOk"
+          },
+          "409": {
+            "$ref": "#/components/responses/409_addError"
+          }
+        },
+        "description": "Añade un pedido con sus datos, como cuerpo de la petición tiene que tener dentro un objeto de Pedido",
+        "tags": [
+          "Pedidos"
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PedidoRequestBody"
+        }
+      }
+    },
+    "/pedidos/{idPedido}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/idPedido"
+        }
+      ],
+      "get": {
+        "summary": "Informacion de un pedido en concreto",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pedido": {
+                      "$ref": "#/components/schemas/Pedido"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "PEDIDO/{ID_PEDIDO}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_Bad_Request"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_noEncontrado"
+          }
+        },
+        "operationId": "get-pedidos-id_pedido",
+        "description": "Obtiene la información de un producto existente",
+        "tags": [
+          "Pedidos"
+        ]
+      },
+      "put": {
+        "summary": "Actualizar Pedido",
+        "operationId": "put-pedidos-id_pedido",
+        "description": "Actualiza el pedido identificado por id_pedido",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pedido": {
+                    "$ref": "#/components/schemas/Pedido"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          },
+          "description": ""
+        },
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "PEDIDO/{ID_PEDIDO}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_logeado"
+          },
+          "403": {
+            "$ref": "#/components/responses/403_permisos"
+          }
+        },
+        "tags": [
+          "Pedidos"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "delete-pedidos-id_pedido",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "PEDIDO/{ID_PEDIDO}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_Bad_Request"
+          },
+          "404": {
+            "description": "idPedido no encontrado",
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "PEDIDO/{ID_PEDIDO}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Elimina un pedido existente",
+        "tags": [
+          "Pedidos"
+        ]
+      },
+      "options": {
+        "summary": "",
+        "operationId": "options-pedidos-idPedido",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Lista de metodos HTTP soportados"
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "PEDIDO/{ID_PEDIDO}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            }
+          }
+        },
+        "description": "Devuelve la lista de métodos soportados HTTP",
+        "tags": [
+          "Pedidos"
+        ]
+      }
+    },
+    "/productos/stock_produto/{idProducto}": {
+      "get": {
+        "operationId": "get-pedidos-stock_produto",
+        "description": "Obtiene el stock de un producto en concreto",
+        "parameters": [
+          {
+            "$ref": "#/components/schemas/Producto"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stock": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "examples": {
+                  "ejemplo": {
+                    "value": {
+                      "stock": 10
+                    }
+                  }
+                }
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "/PRODUCTOS/STOCK_PRODUCTO/{idProducto}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "404": {
+            "description": "Pedido no encontrado",
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "/PRODUCTOS/STOCK_PRODUCTO/{idProducto}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Numero de unidades (stock) de una producto",
+        "tags": [
+          "Productos"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "idProducto",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "options": {
+        "summary": "Operaciones sobre",
+        "operationId": "options-pedidos-stock_produto-idProducto",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Allow": {
+                "$ref": "#/components/headers/Allow"
+              }
+            }
+          }
+        },
+        "description": "Devuelve la lista de métodos soportados HTTP",
+        "tags": [
+          "Productos"
+        ]
+      }
+    },
+    "/productos": {
+      "get": {
+        "summary": "Lista de productos",
+        "tags": [
+          "Productos"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Producto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "/PRODUCTOS",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_logeado"
+          },
+          "403": {
+            "$ref": "#/components/responses/403_permisos"
+          }
+        },
+        "operationId": "get-productos",
+        "description": "Listado de productos"
+      },
+      "post": {
+        "summary": "Añadir producto",
+        "operationId": "post-productos",
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/201_addOk"
+          },
+          "409": {
+            "$ref": "#/components/responses/409_addError"
+          }
+        },
+        "description": "Añade producto",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ProductosRequest"
+        },
+        "tags": [
+          "Productos"
+        ]
+      },
+      "options": {
+        "summary": "Operaciones sobre",
+        "operationId": "options-productos",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Allow": {
+                "$ref": "#/components/headers/Allow"
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "/PRODUCTOS",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Productos"
+        ],
+        "description": "Devuelve la lista de métodos soportados HTTP"
+      }
+    },
+    "/productos/{idProducto}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/idProducto"
+        }
+      ],
+      "get": {
+        "summary": "Datos de un producto",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "productos": {
+                      "$ref": "#/components/schemas/Producto"
+                    }
+                  }
+                }
+              }
+            },
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "/PRODUCTOS/{idProducto}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_logeado"
+          },
+          "403": {
+            "$ref": "#/components/responses/403_permisos"
+          }
+        },
+        "operationId": "get-productos-idProducto",
+        "description": "Datos de un producto en concreto",
+        "tags": [
+          "Productos"
+        ]
+      },
+      "put": {
+        "summary": "Modificar Producto",
+        "operationId": "put-productos-idProducto",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "links": {
+              "SaveEvent": {
+                "operationId": "post-registrarEvento",
+                "parameters": {
+                  "origen": "/PRODUCTOS/{idProducto}",
+                  "fecha": "$response.header.date",
+                  "mensaje": "$response.body",
+                  "nivel": "info"
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "201": {
+            "$ref": "#/components/responses/201_addOk"
+          },
+          "409": {
+            "$ref": "#/components/responses/409_addError"
+          }
+        },
+        "description": "Modificar Producto",
+        "tags": [
+          "Productos"
+        ]
+      },
+      "delete": {
+        "summary": "Borrar producto",
+        "operationId": "delete-productos-idProducto",
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204_deleteOk"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_logeado"
+          },
+          "403": {
+            "$ref": "#/components/responses/403_permisos"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_noEncontrado"
+          }
+        },
+        "description": "Borrado de producto",
+        "tags": [
+          "Productos"
+        ]
+      },
+      "options": {
+        "summary": "Operaciones sobre",
+        "operationId": "options-productos-idProducto",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Allow": {
+                "$ref": "#/components/headers/Allow"
+              }
+            }
+          }
+        },
+        "description": "Devuelve la lista de métodos soportados HTTP",
+        "tags": [
+          "Productos"
+        ]
+      }
+    },
+    "/eventos": {
+      "parameters": [],
+      "post": {
+        "summary": "Crear un evento",
+        "operationId": "post-registrarEvento",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_logeado"
+          },
+          "403": {
+            "$ref": "#/components/responses/403_permisos"
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "origen",
+            "required": true,
+            "description": "Origen de donde viene el evento"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fecha",
+            "required": true,
+            "description": "Fecha cuando se genero el evento"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "mensaje",
+            "required": true,
+            "description": "Mensaje resultante del evento"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "info",
+                "warn",
+                "error"
+              ]
+            },
+            "in": "query",
+            "name": "nivel",
+            "required": true,
+            "description": "De que tipo fue la respuesta del evento"
+          }
+        ],
+        "tags": [
+          "Eventos"
+        ],
+        "description": "Con la información que llega por medio de los parametros dentro de la URL, crea un evento nuevo registrando algo que ocurrio dentro del servidor."
+      },
+      "get": {
+        "summary": "Eventos generados",
+        "operationId": "get-eventos",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array de Eventos",
+                  "items": {
+                    "$ref": "#/components/schemas/Evento"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_logeado"
+          },
+          "403": {
+            "$ref": "#/components/responses/403_permisos"
+          }
+        },
+        "description": "Devuelve en un array todos los eventos que han sido generados",
+        "tags": [
+          "Eventos"
+        ]
+      }
+    },
+    "/evento/{idEvento}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "idEvento",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Obtener Evento Especifico",
+        "tags": [
+          "Eventos"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evento"
+                }
+              }
+            },
+            "headers": {
+              "Etag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-evento-idEvento",
+        "description": "Dado un ID evento como parametro, se busca el evento con el respectivo ID y se retorna como objeto "
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Producto": {
+        "title": "Producto",
+        "type": "object",
+        "example": {
+          "idProducto": 1,
+          "descripcion": "Bici molona",
+          "categoria": {
+            "idCategoria": 1,
+            "descripcion": "Deporte"
+          }
+        },
+        "properties": {
+          "producto": {
+            "type": "object",
+            "minProperties": 1,
+            "properties": {
+              "idProducto": {
+                "type": "integer",
+                "format": "int64",
+                "example": 123456789,
+                "minimum": 1
+              },
+              "descripcion": {
+                "type": "string"
+              },
+              "categoria": {
+                "$ref": "#/components/schemas/Categoria"
+              },
+              "_links": {
+                "type": "object",
+                "description": "link relations",
+                "properties": {
+                  "parent": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  },
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Categoria": {
+        "title": "Categoria",
+        "type": "object",
+        "properties": {
+          "categoria": {
+            "type": "object",
+            "properties": {
+              "idCategoria": {
+                "type": "integer",
+                "format": "int64",
+                "example": 123456789,
+                "minimum": 1
+              },
+              "descripcion": {
+                "type": "string"
+              },
+              "_links": {
+                "type": "object",
+                "description": "link relations",
+                "properties": {
+                  "parent": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  },
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Pedido": {
+        "title": "Pedido",
+        "type": "object",
+        "properties": {
+          "pedido": {
+            "type": "object",
+            "properties": {
+              "idPedido": {
+                "type": "integer",
+                "format": "int64",
+                "example": 111111111,
+                "minimum": 1
+              },
+              "tipo": {
+                "type": "string",
+                "description": "indica si es pedido de compra o de venta",
+                "enum": [
+                  "compra",
+                  "venta"
+                ]
+              },
+              "producto": {
+                "$ref": "#/components/schemas/Producto"
+              },
+              "cantidad": {
+                "type": "integer",
+                "format": "int32",
+                "example": 23,
+                "minimum": 1
+              },
+              "fechaCompra": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "estado": {
+                "type": "string",
+                "description": "estado del pedido",
+                "enum": [
+                  "abierto",
+                  "aceptado",
+                  "enviado",
+                  "recibido"
+                ]
+              },
+              "_links": {
+                "type": "object",
+                "description": "link relations",
+                "properties": {
+                  "parent": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  },
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              },
+              "organizacion": {
+                "$ref": "#/components/schemas/Organizacion"
+              }
+            }
+          }
+        }
+      },
+      "Organizacion": {
+        "title": "Organización",
+        "type": "object",
+        "properties": {
+          "organizacion": {
+            "type": "object",
+            "properties": {
+              "idOrganizacion": {
+                "type": "integer",
+                "format": "int64",
+                "example": 32165478,
+                "minimum": 1
+              },
+              "nombre": {
+                "type": "string"
+              },
+              "descripcion": {
+                "type": "string"
+              },
+              "teléfono": {
+                "type": "string"
+              },
+              "e-mail": {
+                "type": "string",
+                "format": "email"
+              },
+              "direccionPostal": {
+                "type": "object",
+                "description": "Dirección postal",
+                "properties": {
+                  "calle": {
+                    "type": "string"
+                  },
+                  "localidad": {
+                    "type": "string"
+                  },
+                  "provincia": {
+                    "type": "string"
+                  },
+                  "codPostal": {
+                    "type": "string",
+                    "example": "28031"
+                  },
+                  "país": {
+                    "type": "string"
+                  }
+                }
+              },
+              "_links": {
+                "type": "object",
+                "description": "link relations",
+                "properties": {
+                  "parent": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  },
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": ""
+      },
+      "Evento": {
+        "title": "Evento",
+        "type": "object",
+        "properties": {
+          "evento": {
+            "type": "object",
+            "properties": {
+              "idEvento": {
+                "type": "integer",
+                "format": "int64",
+                "example": 878923748,
+                "minimum": 1
+              },
+              "origen": {
+                "type": "string",
+                "example": "PEDIDOS"
+              },
+              "fecha": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "mensaje": {
+                "type": "string"
+              },
+              "nivel": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "warn",
+                  "error"
+                ]
+              },
+              "_links": {
+                "type": "object",
+                "description": "link relations",
+                "properties": {
+                  "parent": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  },
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "description": "Codigo",
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "description": "Mensaje",
+            "type": "string"
+          }
+        },
+        "example": {
+          "code": 200,
+          "message": "Ok"
+        }
+      }
+    },
+    "parameters": {
+      "idPedido": {
+        "name": "idPedido",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "idProducto": {
+        "name": "idProducto",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "headers": {
+      "ETag": {
+        "schema": {
+          "type": "string"
+        },
+        "description": "Entity Tag (unique identifier provided for cache validation)"
+      },
+      "Allow": {
+        "description": "Lista de metodos HTTP soportados",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "400_Bad_Request": {
+        "description": "identificador no valido",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "example": {
+              "code": 400,
+              "message": "No esta identificado como usuario"
+            }
+          }
+        },
+        "links": {
+          "SaveEvent": {
+            "operationId": "post-registrarEvento",
+            "parameters": {
+              "origen": "$url",
+              "fecha": "$response.header.date",
+              "mensaje": "$response.body",
+              "nivel": "error"
+            }
+          }
+        }
+      },
+      "401_logeado": {
+        "description": "No esta identificado como usuario",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "example": {
+              "code": 401,
+              "message": "No esta identificado como usuario"
+            }
+          }
+        },
+        "links": {
+          "SaveEvent": {
+            "operationId": "post-registrarEvento",
+            "parameters": {
+              "origen": "$url",
+              "fecha": "$response.header.date",
+              "mensaje": "$response.body",
+              "nivel": "error"
+            }
+          }
+        }
+      },
+      "403_permisos": {
+        "description": "No posee permisos",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "example": {
+              "code": 403,
+              "message": "No posee permisos"
+            }
+          }
+        },
+        "links": {
+          "SaveEvent": {
+            "operationId": "post-registrarEvento",
+            "parameters": {
+              "origen": "$url",
+              "fecha": "$response.header.date",
+              "mensaje": "$response.body",
+              "nivel": "error"
+            }
+          }
+        }
+      },
+      "404_noEncontrado": {
+        "description": "No encontrado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "example": {
+              "code": 404,
+              "message": "No encontrado"
+            }
+          }
+        },
+        "links": {
+          "SaveEvent": {
+            "operationId": "post-registrarEvento",
+            "parameters": {
+              "origen": "$url",
+              "fecha": "$response.header.date",
+              "mensaje": "$response.body",
+              "nivel": "error"
+            }
+          }
+        }
+      },
+      "409_addError": {
+        "description": "Error al añadir, no añadido",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "example": {
+              "code": 409,
+              "message": "Error al añadir, no añadido"
+            }
+          }
+        },
+        "links": {
+          "SaveEvent": {
+            "operationId": "post-registrarEvento",
+            "parameters": {
+              "origen": "$url",
+              "fecha": "$response.header.date",
+              "mensaje": "$response.body",
+              "nivel": "error"
+            }
+          }
+        }
+      },
+      "201_addOk": {
+        "description": "Añadido correcto",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Producto"
+            }
+          }
+        },
+        "links": {
+          "SaveEvent": {
+            "operationId": "post-registrarEvento",
+            "parameters": {
+              "origen": "$url",
+              "fecha": "$response.header.date",
+              "mensaje": "$response.body",
+              "nivel": "info"
+            }
+          }
+        },
+        "headers": {
+          "Etag": {
+            "$ref": "#/components/headers/ETag"
+          }
+        }
+      },
+      "204_deleteOk": {
+        "description": "BorradoCorrecto",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Message"
+            }
+          }
+        },
+        "links": {
+          "SaveEvent": {
+            "operationId": "post-registrarEvento",
+            "parameters": {
+              "origen": "$url",
+              "fecha": "$response.header.date",
+              "mensaje": "$response.body",
+              "nivel": "info"
+            }
+          }
+        },
+        "headers": {
+          "Location": {
+            "description": "`uri` al nuevo recurso generado",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "Etag": {
+            "$ref": "#/components/headers/ETag"
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "ProductosRequest": {
+        "description": "Producto",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Producto"
+            }
+          }
+        }
+      },
+      "PedidoRequestBody": {
+        "description": "Datos para generar un `Pedido`",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "estado": {
+                  "type": "string",
+                  "description": "estado del pedido",
+                  "enum": [
+                    "abierto",
+                    "aceptado",
+                    "enviado",
+                    "recibido"
+                  ]
+                },
+                "fechaCompra": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "cantidad": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 23,
+                  "minimum": 1
+                },
+                "producto": {
+                  "$ref": "#/components/schemas/Producto"
+                },
+                "tipo": {
+                  "type": "string",
+                  "description": "indica si es pedido de compra o de venta",
+                  "enum": [
+                    "compra",
+                    "venta"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Pedidos",
+      "description": "Gestion de pedidos"
+    },
+    {
+      "name": "Productos",
+      "description": "Getion de Productos"
+    },
+    {
+      "name": "Eventos",
+      "description": "Gestion de Eventos"
+    }
+  ]
+}
