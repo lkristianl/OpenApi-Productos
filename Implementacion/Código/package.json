@@ -4,7 +4,7 @@
   "description": "Implementación de la API de Productos para la asignatura de AOS",
   "main": "main.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "localStorage": "^1.0.4"
   },
   "devDependencies": {},
